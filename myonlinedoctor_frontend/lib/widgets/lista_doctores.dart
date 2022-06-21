@@ -15,12 +15,14 @@ class ListaDoctores extends StatefulWidget {
 
 class MyAppState extends State<ListaDoctores> {
   late Future<List<Doctor>>
-      doctores1; //late to field means that the field will be initialized when you use it for the first time.
+      doctores1; //late to field means that the field will be initialized when you use it for the first timeList<Doctor> list .
+
+  List<Doctor> list = [];
 
   Future<List<Doctor>> _getDoctores() async {
     // es una funcion asincrona. espera a que se resuelva la peticion
-    final response = await http.get(Uri.parse(
-        "https://api.giphy.com/v1/gifs/trending?api_key=slKwW8jr785LH7nkQbhpkmoVFJs1jUXo&limit=10&rating=g"));
+    final response = await http
+        .get(Uri.parse("https://gentle-river-68727.herokuapp.com/doctors"));
 
     List<Doctor> doctores = <Doctor>[];
 
@@ -30,9 +32,13 @@ class MyAppState extends State<ListaDoctores> {
       final jsonDoctores = jsonDecode(
           body); // toma la informacion de un string y la transforma en un json valido
 
-      for (var doctor in jsonDoctores["data"]) {
-        doctores.add(Doctor(doctor["images"]["downsized"]["url"],
-            doctor["title"], doctor["rating"], Specialty(doctor["id"])));
+      print(jsonDoctores);
+      for (var doctor in jsonDoctores) {
+        print(doctor["name"]);
+        print(doctor["last_name"]);
+
+        doctores.add(Doctor("lklk", doctor["name"], doctor["last_name"],
+            [Specialty("psiquiatra")]));
       }
     } else {
       throw Exception("Fallo la conexion");
@@ -47,12 +53,18 @@ class MyAppState extends State<ListaDoctores> {
     doctores1 = _getDoctores();
   }
 
+  transformar() async {
+    doctores1 = _getDoctores();
+    List<Doctor> list = await doctores1;
+    return list;
+  }
+
   // lista de ejemplo de doctores
-  List<Doctor> doctores = [
-    Doctor('jsdbfosdbvs', 'Diego', 'Bastardo', Specialty('Cardiologo')),
-    Doctor('jsdbfosdbvs', 'Luis', 'Bastardo', Specialty('Neurocirujano')),
-    Doctor('jsdbfosdbvs', 'Kamila', 'Reyes', Specialty('Dentista'))
-  ];
+  // List<Doctor> doctores = [
+  //   Doctor('jsdbfosdbvs', 'Diego', 'Bastardo', Specialty('Cardiologo')),
+  //   Doctor('jsdbfosdbvs', 'Luis', 'Bastardo', Specialty('Neurocirujano')),
+  //   Doctor('jsdbfosdbvs', 'Kamila', 'Reyes', Specialty('Dentista'))
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +91,7 @@ class MyAppState extends State<ListaDoctores> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             print(snapshot.data);
-            return const Text("data");
+            return const Text('data');
           } else if (snapshot.hasError) {
             print(snapshot.error);
             return const Text("Error");
@@ -98,7 +110,7 @@ Widget elementList(BuildContext context, List<Doctor> doctores) {
       itemBuilder: ((context, index) {
         return ListTile(
           title: Text("${doctores[index].name} ${doctores[index].lastname}"),
-          subtitle: Text(doctores[index].specialty.specialtyname),
+          subtitle: Text(doctores[index].specialty[0].specialtyname),
           leading:
               CircleAvatar(child: Text(doctores[index].name.substring(0, 1))),
         );

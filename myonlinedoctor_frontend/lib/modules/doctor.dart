@@ -4,7 +4,7 @@ class Doctor {
   String image = '';
   String name = '';
   String lastname = '';
-  Specialty specialty = Specialty('');
+  List<Specialty> specialty = [];
 
   Doctor(this.image, this.name, this.lastname, this.specialty);
 }
