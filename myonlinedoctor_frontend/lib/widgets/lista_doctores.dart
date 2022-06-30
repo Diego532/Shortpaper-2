@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:myonlinedoctor_frontend/modules/specialty.dart';
 import '../modules/doctor.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 // ignore: use_key_in_widget_constructors
 class ListaDoctores extends StatefulWidget {
@@ -53,19 +54,6 @@ class MyAppState extends State<ListaDoctores> {
     doctores1 = _getDoctores();
   }
 
-  transformar() async {
-    doctores1 = _getDoctores();
-    List<Doctor> list = await doctores1;
-    return list;
-  }
-
-  // lista de ejemplo de doctores
-  // List<Doctor> doctores = [
-  //   Doctor('jsdbfosdbvs', 'Diego', 'Bastardo', Specialty('Cardiologo')),
-  //   Doctor('jsdbfosdbvs', 'Luis', 'Bastardo', Specialty('Neurocirujano')),
-  //   Doctor('jsdbfosdbvs', 'Kamila', 'Reyes', Specialty('Dentista'))
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,16 +75,17 @@ class MyAppState extends State<ListaDoctores> {
           //iconTheme: Icons.search
           ),
       body: FutureBuilder(
-        future: doctores1,
+        future: _getDoctores(), // toy aqui
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
             print(snapshot.data);
-            return const Text('data');
-          } else if (snapshot.hasError) {
-            print(snapshot.error);
-            return const Text("Error");
+            return elementList(
+                context,
+                snapshot.data as List<
+                    Doctor>); // se debe especificar el snapshot.data como que objeto se quiere transferir
           }
-          return const Center(child: CircularProgressIndicator());
         },
       ),
       // elementList(context, doctores)
